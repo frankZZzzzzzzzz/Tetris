@@ -10,7 +10,7 @@ public class CycleCounter {
         timeCounter = 0;
         cycleTime = cycleTimeMilis;
     }
-    public void increment(float timeStep){
+    public void increment(long timeStep){
         timeCounter += timeStep;
     }
     public int getNumOfCycles(){

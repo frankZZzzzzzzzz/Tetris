@@ -20,6 +20,10 @@ public class Keyboard {
         if (releasedKey != null)
             KeysInOrder.remove(releasedKey);
     }
+    public void increment(long timeStep){
+        for (Key key : KeysInOrder)
+            key.increment(timeStep);
+    }
     public LinkedList<Integer> getKeyCycle(){
         LinkedList<Integer> keyCycleOrder = new LinkedList<Integer>();
         while (true){

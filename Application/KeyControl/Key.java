@@ -9,6 +9,9 @@ public class Key {
         this.keyCode = keyCode;
         TimeCounter = new CycleCounter();
     }
+    public void increment(long timeStep){
+        TimeCounter.increment(timeStep);
+    }
     public int getKeyCode(){
         return (keyCode);
     }

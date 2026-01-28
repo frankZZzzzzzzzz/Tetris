@@ -1,7 +1,10 @@
 package Tetris;
 
+import processing.core.*;
+
 import Application.Cycler.CycleCounter;
 import Tetris.TetrisPieces.TetrisPiece;
+import Application.KeyControl.Keyboard;
 
 import java.util.LinkedList;
 
@@ -111,13 +114,55 @@ public class TetrisBoard{
             fallingBoard[r-1] = fallingBoard[r];
         fallingBoard[fallingBoard.length-1] = new int[fallingBoard[0].length];
     }
-    public void update(int timeStep){
+    private void pieceRight(){
+        for (int r = 0; r < fallingBoard.length; r++)
+            if (fallingBoard[r][0] != 0)
+                return;
+
+        for (int r = 0; r < fallingBoard.length; r++)
+            for (int c = 1; c < fallingBoard[r].length; c++)
+                if (fallingBoard[r][c] != 0 && permanentBoard[r][c-1] != 0)
+                    return;
+
+        for (int r = 0; r < fallingBoard.length; r++)
+            for (int c = 1; c < fallingBoard[r].length; c++)
+                fallingBoard[r][c-1] = fallingBoard[r][c];
+
+        for (int r = 0; r < fallingBoard.length; r++)
+            fallingBoard[r][fallingBoard[r].length] = 0;
+    }
+    private void pieceLeft(){
+        for (int r = 0; r < fallingBoard.length; r++)
+            if (fallingBoard[r][fallingBoard[r].length] != 0)
+                return;
+
+        for (int r = 0; r < fallingBoard.length; r++)
+            for (int c = 0; c < fallingBoard[r].length-1; c++)
+                if (fallingBoard[r][c] != 0 && permanentBoard[r][c+1] != 0)
+                    return;
+
+        for (int r = 0; r < fallingBoard.length; r++)
+            for (int c = 1; c < fallingBoard[r].length; c++)
+                fallingBoard[r][c] = fallingBoard[r][c-1];
+
+        for (int r = 0; r < fallingBoard.length; r++)
+            fallingBoard[r][0] = 0;
+    }
+    public void update(int timeStep, Keyboard keyboard){
+        LinkedList<Integer> keystrokes = keyboard.getKeyCycle();
         cycler.increment(timeStep);
 
         int cycles = cycler.getNumOfCycles();
 
         for (int i = 0; i < cycles; i++){
             pieceFall();
+        }
+    }
+    public void inputHandler(int keyCode){
+        switch (keyCode){
+            case PConstants.DOWN: pieceFall(); break;
+            case PConstants.LEFT: pieceLeft(); break;
+            case PConstants.RIGHT: pieceRight(); break;
         }
     }
 

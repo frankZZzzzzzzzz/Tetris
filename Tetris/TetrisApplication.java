@@ -78,7 +78,8 @@ public class TetrisApplication extends Application {
     public void update(int timeStep){
         if (!hasStarted)
             return;
-        board.update(timeStep);
+        keyboard.increment(timeStep);
+        board.update(timeStep,keyboard);
     }
     public void drawAllFunctionButtons(){
         for (FunctionButton button : functionButtons)
