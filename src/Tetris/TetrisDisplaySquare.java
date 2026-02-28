@@ -1,7 +1,6 @@
 package Tetris;
 
 import Tetris.TetrisPieces.TetrisPiece;
-import com.sun.source.tree.NewArrayTree;
 import processing.core.PApplet;
 
 public class TetrisDisplaySquare extends Box{

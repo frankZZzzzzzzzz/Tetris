@@ -23,6 +23,7 @@ public class TetrisApplication extends Application {
         hasStarted = false;
         hasEnded = false;
         board = new TetrisBoard();
+        keyboard = new Keyboard();
 
         //Main Board
         int boardHeight = Math.min(pa.width/2, pa.height);
@@ -70,10 +71,10 @@ public class TetrisApplication extends Application {
 
     }
     public void keyReleased(){
-
+        keyboard.releasedKey(currPA.keyCode);
     }
     public void keyPressed(){
-        keyboard.pressedKey(currPA.key);
+        keyboard.pressedKey(currPA.keyCode);
     }
     public void update(int timeStep){
         if (!hasStarted)

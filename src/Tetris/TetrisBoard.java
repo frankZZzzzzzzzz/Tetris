@@ -19,138 +19,119 @@ import java.util.LinkedList;
  */
 
 public class TetrisBoard{
-    private int[][] permanentBoard;
-    private int[][] fallingBoard;
-    private TetrisPiece holdPiece;
-    private TetrisPiece currPiece;
-    private LinkedList<TetrisPiece> nextPieces;
+    protected int[][] permanentBoard;
+    protected TetrisPiece holdPiece;
+    protected TetrisPiece currPiece;
+    protected LinkedList<TetrisPiece> nextPieces;
     private CycleCounter cycler;
     public TetrisBoard(){
         permanentBoard = new int[20][10];
-        fallingBoard = new int[20][10];
         holdPiece = null;
-        currPiece = null;
+        currPiece = TetrisPiece.random();
 
         cycler = new CycleCounter();
 
         nextPieces = new LinkedList<TetrisPiece>();
-        TetrisPiece[] allPieces = TetrisPiece.allPieces;
 
         for (int i = 0; i < 5; i++)
-            nextPieces.add(allPieces[(int)(Math.random()*allPieces.length)]);
-        placeUpcomingPiece();
+            nextPieces.add(TetrisPiece.random());
     }
     private void placePieceAtTop(TetrisPiece piece){
         currPiece = piece;
-        int[][] piecePlacement = currPiece.getPlacement();
-        for (int r = 0; r < piecePlacement.length; r++)
-            for (int c = 0; c < piecePlacement[r].length; c++)
-                fallingBoard[19-r][4-(piecePlacement[r].length-1)/2+c] = piecePlacement[r][c];
-    }
-    public void clearFallingBoard(){
-        fallingBoard = new int[20][10];
     }
     public void clearPermanentBoard(){
         permanentBoard = new int[20][10];
     }
     public void reset(){
         clearPermanentBoard();
-        clearFallingBoard();
         holdPiece = null;
-        currPiece = null;
+        currPiece = TetrisPiece.random();
+
+        cycler = new CycleCounter();
 
         nextPieces = new LinkedList<TetrisPiece>();
-        TetrisPiece[] allPieces = TetrisPiece.allPieces;
 
         for (int i = 0; i < 5; i++)
-            nextPieces.add(allPieces[(int)(Math.random()*allPieces.length)]);
-        placeUpcomingPiece();
+            nextPieces.add(TetrisPiece.random());
     }
-    public int[][][] getBoard(){
-        return (new int[][][]{fallingBoard,permanentBoard});
+    public int[][] getPermanentBoard(){
+        return(permanentBoard);
     }
     private void placeUpcomingPiece(){
-        TetrisPiece[] allPieces = TetrisPiece.allPieces;
-        nextPieces.add(allPieces[(int)(Math.random()*allPieces.length)]);
+        nextPieces.add(TetrisPiece.random());
         placePieceAtTop(nextPieces.removeFirst());
     }
     private void switchHold(){
         if (holdPiece == null){
-            clearFallingBoard();
             holdPiece = currPiece;
             placeUpcomingPiece();
         }
         else{
-            clearFallingBoard();
             TetrisPiece temp = holdPiece;
             holdPiece = currPiece;
 
+            temp.reset();
             placePieceAtTop(temp);
         }
     }
     private void setPiecesPermanent(){
-        for (int r = 0; r < fallingBoard.length; r++)
-            for (int c = 0; c < fallingBoard[r].length; c++)
-                if (fallingBoard[r][c] != 0)
-                    permanentBoard[r][c] = fallingBoard[r][c];
+        int color = currPiece.getColor();
+        for (int[] position : currPiece.getPositons()){
+            permanentBoard[position[0]][position[1]] = color;
+        }
+
+        placeUpcomingPiece();
     }
-    private void pieceFall(){
-        for (int c = 0; c < fallingBoard[0].length; c++)
-            if (fallingBoard[0][c] != 0){
-                setPiecesPermanent();
-                clearFallingBoard();
-                placeUpcomingPiece();
-                return;
+    private boolean canPieceShift(int rShift, int cShift){
+        int[][] piecePostion = currPiece.getPositons();
+        for (int[] position : piecePostion)
+            if (position[0]+rShift < 0 || position[0]+rShift >= permanentBoard.length ||
+                position[1]+cShift < 0 || position[1]+cShift >= permanentBoard[0].length ||
+                    permanentBoard[position[0]+rShift][position[1]+cShift] != 0){
+                return (false);
             }
-        for (int r = 1; r < fallingBoard.length; r++)
-            for (int c = 0; c < fallingBoard[r].length; c++)
-                if (fallingBoard[r][c] != 0 && permanentBoard[r-1][c] != 0){
-                    setPiecesPermanent();
-                    clearFallingBoard();
-                    placeUpcomingPiece();
-                    return;
-                }
-        for (int r = 1; r < fallingBoard.length; r++)
-            fallingBoard[r-1] = fallingBoard[r];
-        fallingBoard[fallingBoard.length-1] = new int[fallingBoard[0].length];
+        return (true);
+    }
+    private boolean pieceFall(){
+        if (!canPieceShift(-1,0)){
+            setPiecesPermanent();
+            return (false);
+        }
+        currPiece.shiftDown();
+        return (true);
     }
     private void pieceRight(){
-        for (int r = 0; r < fallingBoard.length; r++)
-            if (fallingBoard[r][0] != 0)
-                return;
-
-        for (int r = 0; r < fallingBoard.length; r++)
-            for (int c = 1; c < fallingBoard[r].length; c++)
-                if (fallingBoard[r][c] != 0 && permanentBoard[r][c-1] != 0)
-                    return;
-
-        for (int r = 0; r < fallingBoard.length; r++)
-            for (int c = 1; c < fallingBoard[r].length; c++)
-                fallingBoard[r][c-1] = fallingBoard[r][c];
-
-        for (int r = 0; r < fallingBoard.length; r++)
-            fallingBoard[r][fallingBoard[r].length] = 0;
+        if (!canPieceShift(0,1))
+            setPiecesPermanent();
+        currPiece.shiftDown();;
     }
     private void pieceLeft(){
-        for (int r = 0; r < fallingBoard.length; r++)
-            if (fallingBoard[r][fallingBoard[r].length] != 0)
+        if (!canPieceShift(0,-1))
+            setPiecesPermanent();
+        currPiece.shiftDown();;
+    }
+    private void dropPiece(){
+        while (true)
+            if(!pieceFall())
                 return;
-
-        for (int r = 0; r < fallingBoard.length; r++)
-            for (int c = 0; c < fallingBoard[r].length-1; c++)
-                if (fallingBoard[r][c] != 0 && permanentBoard[r][c+1] != 0)
-                    return;
-
-        for (int r = 0; r < fallingBoard.length; r++)
-            for (int c = 1; c < fallingBoard[r].length; c++)
-                fallingBoard[r][c] = fallingBoard[r][c-1];
-
-        for (int r = 0; r < fallingBoard.length; r++)
-            fallingBoard[r][0] = 0;
     }
     public void update(int timeStep, Keyboard keyboard){
         LinkedList<Integer> keystrokes = keyboard.getKeyCycle();
         cycler.increment(timeStep);
+        /*
+        if (!keystrokes.isEmpty())
+            System.out.println("NOT EMPTY");
+
+        if (!keystrokes.isEmpty()){
+            System.out.print("KEYS: ");
+            for (Integer keyCode : keystrokes)
+                System.out.print(keyCode +  " ");
+            System.out.println();
+        }
+
+         */
+        for (Integer keyCode : keystrokes)
+            inputHandler(keyCode);
 
         int cycles = cycler.getNumOfCycles();
 
@@ -163,16 +144,9 @@ public class TetrisBoard{
             case PConstants.DOWN: pieceFall(); break;
             case PConstants.LEFT: pieceLeft(); break;
             case PConstants.RIGHT: pieceRight(); break;
+            case ' ': dropPiece(); break;
+            default: return;
         }
-    }
 
-    public TetrisPiece getHoldPiece() {
-        return holdPiece;
-    }
-    public TetrisPiece getCurrPiece() {
-        return currPiece;
-    }
-    public LinkedList<TetrisPiece> getNextPieces() {
-        return nextPieces;
     }
 }

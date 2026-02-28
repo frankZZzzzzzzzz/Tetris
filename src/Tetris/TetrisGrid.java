@@ -41,11 +41,16 @@ public class TetrisGrid {
         currPA.rect(xPos,yPos,width,height);
     }
     private void drawTetrisGrid(){
-        int[][][] currBoard = board.getBoard();
+        int[][] currBoard = board.permanentBoard;
         for (int r = 0; r < 20; r++)
-            for (int c = 0; c < 10; c++){
-                grid[r][c].draw(currPA, currBoard[0][r][c] != 0 ? currBoard[0][r][c]: currBoard[1][r][c]);
-            }
+            for (int c = 0; c < 10; c++)
+                grid[r][c].draw(currPA, currBoard[r][c]);
+
+        int[][] currPiecePositions = board.currPiece.getPositons();
+        int color = board.currPiece.getColor();
+
+        for (int[] positon : currPiecePositions)
+            grid[positon[0]][positon[0]].draw(currPA, color);
     }
     private void drawWhiteOutline(){
         int boxWidth = width/10;

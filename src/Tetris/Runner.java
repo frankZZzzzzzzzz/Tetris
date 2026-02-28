@@ -19,8 +19,10 @@ public class Runner extends PApplet {
     public void settings(){
         size(1000,500);
     }
+    public void keyReleased(){
+        ApplicationStack.getFirst().keyReleased();
+    }
     public void keyPressed(){
-        System.out.println(keyCode + " " + (char)keyCode);
         ApplicationStack.getFirst().keyPressed();
     }
     public void mouseReleased(){

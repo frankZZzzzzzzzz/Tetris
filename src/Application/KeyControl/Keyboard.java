@@ -8,6 +8,9 @@ public class Keyboard {
         KeysInOrder = new LinkedList<Key>();
     }
     public void pressedKey(int keyCode){
+        for (Key key : KeysInOrder)
+            if (key.getKeyCode() == keyCode)
+                return;
         KeysInOrder.add(new Key(keyCode));
     }
     public void releasedKey(int keyCode){
@@ -26,6 +29,9 @@ public class Keyboard {
     }
     public LinkedList<Integer> getKeyCycle(){
         LinkedList<Integer> keyCycleOrder = new LinkedList<Integer>();
+        if (KeysInOrder.isEmpty())
+            return (keyCycleOrder);
+
         while (true){
             for (Key currKey : KeysInOrder)
                 if (currKey.isNextCycle())

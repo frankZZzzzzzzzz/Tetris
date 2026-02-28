@@ -3,8 +3,6 @@ package Tetris.TetrisPieces;
 import Tetris.UsefulFunctions;
 
 import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Objects;
 
 /*
 0 - I piece (Cyan - 0,255,255)
@@ -17,27 +15,94 @@ import java.util.Objects;
  */
 
 public abstract class TetrisPiece {
-    public static final TetrisPiece[] allPieces = allTetrisPieces();
     protected final int placeHolder = UsefulFunctions.color(0,0,0,0);
-    protected int color;
-    protected int[][] placement;
-    public int getColor(){
-        return (color);
-    }
-    public int[][] getPlacement(){
-        return (placement);
+    public static TetrisPiece random(){
+        switch((int)(Math.random()*7)){
+            case 0: return (new IPiece());
+            case 1: return (new LPiece());
+            case 2: return (new JPiece());
+            case 3: return (new SPiece());
+            case 4: return (new ZPiece());
+            case 5: return (new TPiece());
+            default: return (new OPiece());
+        }
     }
 
+    protected int[][] positions;
+    protected int color;
     @Override
     public boolean equals(Object other) {
         if (other == this)
             return (true);
         return (other instanceof TetrisPiece &&
                 ((TetrisPiece)other).color == color &&
-                Arrays.deepEquals(((TetrisPiece)other).placement, placement));
+                Arrays.deepEquals(((TetrisPiece)other).positions, positions));
     }
-
-    private static TetrisPiece[] allTetrisPieces(){
-        return (new TetrisPiece[]{new IPiece(), new LPiece(), new JPiece(), new SPiece(), new ZPiece(), new TPiece(), new OPiece()});
+    public int[][] getRotateClockWise(){
+        int[][] rotated = new int[positions.length][2];
+        int r = 0;
+        int c = 0;
+        for (int[] position: positions){
+            r += position[0];
+            c += position[1];
+        }
+        r /= positions.length;
+        c /= positions.length;
+        for (int i = 0; i < positions.length; i++){
+            rotated[i][0] = (positions[i][1]-c) + c;
+            rotated[i][1] = -(positions[i][0]-r) + r;
+        }
+        return (rotated);
+    }
+    public int[][] getRotateCounterClockWise(){
+        int[][] rotated = new int[positions.length][2];
+        int r = 0;
+        int c = 0;
+        for (int[] position: positions){
+            r += position[0];
+            c += position[1];
+        }
+        r /= positions.length;
+        c /= positions.length;
+        for (int i = 0; i < positions.length; i++){
+            rotated[i][0] = -(positions[i][1]-c) + c;
+            rotated[i][1] = (positions[i][0]-r) + r;
+        }
+        return (rotated);
+    }
+    public int[][] getRotate180(){
+        int[][] rotated = new int[positions.length][2];
+        int r = 0;
+        int c = 0;
+        for (int[] position: positions){
+            r += position[0];
+            c += position[1];
+        }
+        r /= positions.length;
+        c /= positions.length;
+        for (int i = 0; i < positions.length; i++){
+            rotated[i][0] = -(positions[i][1]-c) + c;
+            rotated[i][1] = -(positions[i][0]-r) + r;
+        }
+        return (rotated);
+    }
+    public abstract void reset();
+    public int getColor(){
+        return (color);
+    }
+    public int[][] getPositons(){
+        return (positions);
+    }
+    public void shiftDown(){
+        for (int[] position: positions)
+            position[0]--;
+    }
+    public void shiftRight(){
+        for (int[] position: positions)
+            position[1]++;
+    }
+    public void shiftLeft(){
+        for (int[] position: positions)
+            position[1]--;
     }
 }

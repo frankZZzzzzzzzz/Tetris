@@ -4,7 +4,7 @@ public class CycleCounter {
     private long timeCounter;
     private long cycleTime = 1000; // milliseconds
     public CycleCounter(){
-        timeCounter = 0;
+        timeCounter = cycleTime;
     }
     public CycleCounter(long cycleTimeMilis){
         timeCounter = 0;
